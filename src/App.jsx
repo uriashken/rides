@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import html2canvas from 'html2canvas'
 import {
   DndContext,
   DragOverlay,
@@ -24,6 +25,7 @@ export default function App() {
   const [error, setError] = useState(null)
   const [activeParent, setActiveParent] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(null)
+  const exportRef = useRef(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -36,15 +38,7 @@ export default function App() {
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error)
-        const events = data.events || []
-        // DEMO ONLY: inject fake second practice on Apr 8
-        const mockEvent = {
-          id: 'mock-apr8-evening',
-          summary: 'אימון ילדים ערב',
-          start: '2026-04-08T19:00:00+03:00',
-          end: '2026-04-08T21:00:00+03:00',
-        }
-        setDays(groupAndProcessPractices([...events, mockEvent]))
+        setDays(groupAndProcessPractices(data.events || []))
         setLoading(false)
       })
       .catch((err) => {
@@ -64,6 +58,15 @@ export default function App() {
       }
     })
     return unsub
+  }, [])
+
+  const handleExport = useCallback(async () => {
+    if (!exportRef.current) return
+    const canvas = await html2canvas(exportRef.current, { scale: 2, backgroundColor: '#f0f4f8' })
+    const link = document.createElement('a')
+    link.download = `הסעות-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
   }, [])
 
   const saveAssignments = useCallback(async (newSlots) => {
@@ -177,7 +180,28 @@ export default function App() {
         </div>
 
         {/* Content */}
-        <div style={{ padding: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px 0' }}>
+          <button
+            onClick={handleExport}
+            style={{
+              background: '#1e293b',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            📸 ייצא תמונה
+          </button>
+        </div>
+
+        <div ref={exportRef} style={{ padding: '16px' }}>
           {loading && (
             <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b' }}>
               <div style={{ fontSize: '40px', marginBottom: '12px' }}>⏳</div>
