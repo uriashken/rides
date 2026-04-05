@@ -22,14 +22,17 @@ body {
   gap: 12px;
 }
 
-@media (min-width: 640px) {
-  .practice-cards-grid {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
+.days-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
-  .practice-cards-grid > * {
-    flex: 1 1 300px;
+@media (min-width: 640px) {
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    align-items: start;
   }
 }

@@ -206,8 +206,9 @@ export default function App() {
             </div>
           )}
 
+          <div className="days-grid">
           {days.map((day) => (
-            <div key={day.dateStr} style={{ marginBottom: '24px' }}>
+            <div key={day.dateStr}>
               {/* Day header */}
               <div
                 style={{
@@ -252,6 +253,7 @@ export default function App() {
               </div>
             </div>
           ))}
+          </div>
         </div>
 
         {/* Drag overlay */}
