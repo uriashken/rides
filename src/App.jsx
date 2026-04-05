@@ -36,7 +36,15 @@ export default function App() {
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error)
-        setDays(groupAndProcessPractices(data.events || []))
+        const events = data.events || []
+        // DEMO ONLY: inject fake second practice on Apr 8
+        const mockEvent = {
+          id: 'mock-apr8-evening',
+          summary: 'אימון ילדים ערב',
+          start: '2026-04-08T19:00:00+03:00',
+          end: '2026-04-08T21:00:00+03:00',
+        }
+        setDays(groupAndProcessPractices([...events, mockEvent]))
         setLoading(false)
       })
       .catch((err) => {
