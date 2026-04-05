@@ -63,10 +63,10 @@ export default function App() {
   const handleExport = useCallback(async () => {
     if (!exportRef.current) return
     const canvas = await html2canvas(exportRef.current, { scale: 2, backgroundColor: '#f0f4f8' })
-    const link = document.createElement('a')
-    link.download = `הסעות-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
+    canvas.toBlob(async (blob) => {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+      alert('התמונה הועתקה! אפשר להדביק בוואטסאפ 📋')
+    }, 'image/png')
   }, [])
 
   const saveAssignments = useCallback(async (newSlots) => {
@@ -128,7 +128,7 @@ export default function App() {
           </h1>
         </div>
         <p style={{ color: '#94a3b8', fontSize: '13px' }}>
-          גרור שם הורה לתוך הסעה
+          גרור שם אל אחד הסלוטים הפנויים
         </p>
         {lastUpdated && (
           <p style={{ color: '#64748b', fontSize: '11px', marginTop: '4px' }}>
