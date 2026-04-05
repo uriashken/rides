@@ -15,7 +15,7 @@ import { groupAndProcessPractices, formatHebrewDate } from './utils/calendarUtil
 import PracticeCard from './components/PracticeCard'
 import ParentChip, { getParentColor } from './components/ParentChip'
 
-const PARENTS = ['אשכנזי-פומרנץ', 'שיינקוף', 'גבראל', 'בירנבאום']
+const PARENTS = ['אשכנזי-פומרנץ', 'שיינקוף', 'גבראל', 'גרינבאום']
 const FIRESTORE_DOC = 'assignments/current'
 
 export default function App() {
