@@ -104,17 +104,18 @@ export default function App() {
           boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
         }}
       >
-        <div style={{ fontSize: '32px', marginBottom: '6px' }}>🏀</div>
-        <h1
-          style={{
-            color: '#fff',
-            fontSize: '22px',
-            fontWeight: 800,
-            marginBottom: '4px',
-          }}
-        >
-          הסעות ילדים חצב
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '6px' }}>
+          <img src="/logo.png" alt="הפועל כפר סבא" style={{ height: '56px', width: '56px', objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: '4px' }} />
+          <h1
+            style={{
+              color: '#fff',
+              fontSize: '22px',
+              fontWeight: 800,
+            }}
+          >
+            הסעות ילדים חצב
+          </h1>
+        </div>
         <p style={{ color: '#94a3b8', fontSize: '13px' }}>
           גרור שם הורה לתוך הסעה
         </p>
