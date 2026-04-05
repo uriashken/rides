@@ -168,7 +168,7 @@ export default function App() {
         </div>
 
         {/* Content */}
-        <div style={{ padding: '16px', maxWidth: '720px', margin: '0 auto' }}>
+        <div style={{ padding: '16px' }}>
           {loading && (
             <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b' }}>
               <div style={{ fontSize: '40px', marginBottom: '12px' }}>⏳</div>
