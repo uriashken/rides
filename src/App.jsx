@@ -239,6 +239,7 @@ export default function App() {
             </div>
           )}
 
+          <div className="days-grid-wrapper">
           <div className="days-grid">
           {days.map((day) => (
             <div key={day.dateStr}>
@@ -286,6 +287,7 @@ export default function App() {
               </div>
             </div>
           ))}
+          </div>
           </div>
         </div>
 

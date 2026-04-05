@@ -29,13 +29,17 @@ body {
 }
 
 @media (min-width: 640px) {
+  .days-grid-wrapper {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+  }
+
   .days-grid {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: flex-start;
-    justify-content: center;
-    overflow-x: auto;
     gap: 16px;
   }
 
