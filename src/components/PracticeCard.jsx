@@ -35,13 +35,13 @@ export default function PracticeCard({ group, slotData, onClear }) {
 
   const slots = isPair
     ? [
-        { id: `${e1.id}_to`, label: '🚗 הסעה להגעה' },
+        { id: `${e1.id}_to`, label: '🚗 הסעה לאימון' },
         { id: `${e1.id}_mid`, label: '🔄 הסעה בין האימונים' },
-        { id: `${e1.id}_from`, label: '🏠 הסעה לחזרה' },
+        { id: `${e1.id}_from`, label: '🏠 הסעה חזרה' },
       ]
     : [
-        { id: `${e1.id}_to`, label: '🚗 הסעה להגעה' },
-        { id: `${e1.id}_from`, label: '🏠 הסעה לחזרה' },
+        { id: `${e1.id}_to`, label: '🚗 הסעה לאימון' },
+        { id: `${e1.id}_from`, label: '🏠 הסעה חזרה' },
       ]
 
   return (

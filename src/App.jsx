@@ -240,7 +240,7 @@ export default function App() {
               </div>
 
               {/* Practice cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="practice-cards-grid">
                 {day.groups.map((group) => (
                   <PracticeCard
                     key={group.events[0].id}
