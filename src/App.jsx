@@ -128,7 +128,7 @@ export default function App() {
           </h1>
         </div>
         <p style={{ color: '#94a3b8', fontSize: '13px' }}>
-          גרור שם אל אחד הסלוטים הפנויים
+          גררו שם אל אחד הסלוטים הפנויים
         </p>
         {lastUpdated && (
           <p style={{ color: '#64748b', fontSize: '11px', marginTop: '4px' }}>
