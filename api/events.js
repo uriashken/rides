@@ -82,12 +82,13 @@ async function fetchCalendarEvents(accessToken) {
     throw new Error(`שגיאה בקבלת אירועים: ${JSON.stringify(eventsData)}`)
   }
 
-  // Filter only events with "אימון ילדים" or "משחק ליגה" in the title
+  // Filter only events with "אימון ילדים", "משחק ליגה", or "משחק אימון" in the title
   const relevant = eventsData.items.filter((ev) => {
     const summary = ev.summary || ''
     return (
-      summary.includes('אימון') && summary.includes('ילדים') ||
-      summary.includes('משחק') && summary.includes('ליגה')
+      (summary.includes('אימון') && summary.includes('ילדים')) ||
+      (summary.includes('משחק') && summary.includes('ליגה')) ||
+      (summary.includes('משחק') && summary.includes('אימון'))
     )
   })
 
