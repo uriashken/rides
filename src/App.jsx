@@ -11,11 +11,11 @@ import {
 } from '@dnd-kit/core'
 import { doc, onSnapshot, setDoc } from 'firebase/firestore'
 import { db } from './firebase'
-import { groupAndProcessPractices, formatHebrewDate } from './utils/calendarUtils'
+import { groupAndProcessPractices, formatHebrewDate, formatTime } from './utils/calendarUtils'
 import PracticeCard from './components/PracticeCard'
 import ParentChip, { getParentColor } from './components/ParentChip'
 
-const PARENTS = ['אשכנזי-פומרנץ', 'שיינקוף', 'גבראל', 'גרינבאום']
+const PARENTS = ['אשכנזי-פומרנץ', 'שיינקופף', 'גבראל', 'גרינבאום']
 const FIRESTORE_DOC = 'assignments/current'
 
 export default function App() {
@@ -25,6 +25,7 @@ export default function App() {
   const [error, setError] = useState(null)
   const [activeParent, setActiveParent] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [notification, setNotification] = useState(null)
   const exportRef = useRef(null)
 
   const sensors = useSensors(
@@ -32,13 +33,20 @@ export default function App() {
     useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } })
   )
 
-  // Fetch events from API
+  const dismissNotification = useCallback(() => {
+    setNotification(null)
+  }, [])
+
+  // Fetch events + detect changes on every page load
   useEffect(() => {
-    fetch('/api/events')
+    fetch('/api/sync-events')
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error)
         setDays(groupAndProcessPractices(data.events || []))
+        if (data.changes?.length > 0) {
+          setNotification({ changes: data.changes })
+        }
         setLoading(false)
       })
       .catch((err) => {
@@ -104,8 +112,83 @@ export default function App() {
     [assignments, saveAssignments]
   )
 
+  function formatChangeText(change) {
+    if (change.type === 'removed') {
+      return `האירוע "${change.event.summary}" נמחק`
+    }
+    if (change.type === 'added') {
+      return `נוסף אירוע חדש: "${change.event.summary}" בתאריך ${formatTime(change.event.start)}`
+    }
+    if (change.type === 'modified') {
+      const { oldEvent, newEvent } = change
+      if (oldEvent.summary !== newEvent.summary) {
+        return `"${oldEvent.summary}" שונה ל-"${newEvent.summary}"`
+      }
+      if (oldEvent.start !== newEvent.start) {
+        return `"${newEvent.summary}" — השעה שונתה מ-${formatTime(oldEvent.start)} ל-${formatTime(newEvent.start)}`
+      }
+      return `"${newEvent.summary}" עודכן`
+    }
+    return ''
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: '#f0f4f8' }}>
+      {notification && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: '16px',
+              padding: '28px 24px',
+              maxWidth: '380px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              direction: 'rtl',
+            }}
+          >
+            <div style={{ fontSize: '32px', textAlign: 'center', marginBottom: '12px' }}>📅</div>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', margin: '0 0 8px', textAlign: 'center' }}>
+              שים לב — היומן התעדכן
+            </h2>
+            <p style={{ color: '#64748b', fontSize: '13px', textAlign: 'center', margin: '0 0 16px' }}>
+              מאז הפעם האחרונה שנכנסת, חלו השינויים הבאים:
+            </p>
+            <ul style={{ margin: '0 0 20px', padding: '0 16px', color: '#334155', fontSize: '14px', lineHeight: '1.8' }}>
+              {notification.changes.map((change, i) => (
+                <li key={i}>{formatChangeText(change)}</li>
+              ))}
+            </ul>
+            <button
+              onClick={dismissNotification}
+              style={{
+                width: '100%',
+                background: '#1e293b',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '12px',
+                fontSize: '15px',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              הבנתי
+            </button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div
         style={{

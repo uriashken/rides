@@ -3,7 +3,7 @@ import { useDraggable } from '@dnd-kit/core'
 
 const COLORS = {
   'אשכנזי-פומרנץ': { bg: '#4f46e5', text: '#fff' },
-  שיינקוף: { bg: '#0891b2', text: '#fff' },
+  שיינקופף: { bg: '#0891b2', text: '#fff' },
   גבראל: { bg: '#059669', text: '#fff' },
   בירנבאום: { bg: '#d97706', text: '#fff' },
 }
