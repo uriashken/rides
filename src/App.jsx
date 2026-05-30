@@ -26,6 +26,7 @@ export default function App() {
   const [activeParent, setActiveParent] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [notification, setNotification] = useState(null)
+  const [pendingSwap, setPendingSwap] = useState(null)
   const exportRef = useRef(null)
 
   const sensors = useSensors(
@@ -97,10 +98,28 @@ export default function App() {
     const parentName = active.id.toString().replace(/_source_\d+$/, '')
     const slotId = over.id
 
+    if (assignments[slotId] && assignments[slotId] !== parentName) {
+      setPendingSwap({ slotId, parentName, existing: assignments[slotId] })
+      return
+    }
+
     const newSlots = { ...assignments, [slotId]: parentName }
     setAssignments(newSlots)
     saveAssignments(newSlots)
   }
+
+  const handleConfirmSwap = useCallback(() => {
+    if (!pendingSwap) return
+    const { slotId, parentName } = pendingSwap
+    const newSlots = { ...assignments, [slotId]: parentName }
+    setAssignments(newSlots)
+    saveAssignments(newSlots)
+    setPendingSwap(null)
+  }, [pendingSwap, assignments, saveAssignments])
+
+  const handleCancelSwap = useCallback(() => {
+    setPendingSwap(null)
+  }, [])
 
   const handleClear = useCallback(
     (slotId) => {
@@ -134,6 +153,76 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f0f4f8' }}>
+      {pendingSwap && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1100,
+            padding: '20px',
+          }}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: '16px',
+              padding: '28px 24px',
+              maxWidth: '360px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              direction: 'rtl',
+            }}
+          >
+            <div style={{ fontSize: '32px', textAlign: 'center', marginBottom: '12px' }}>⚠️</div>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', margin: '0 0 10px', textAlign: 'center' }}>
+              שימו לב! הסלוט תפוס
+            </h2>
+            <p style={{ color: '#334155', fontSize: '14px', textAlign: 'center', margin: '0 0 20px', lineHeight: '1.7' }}>
+              הסלוט שבחרתם כבר תפוס ע"י{' '}
+              <strong>{pendingSwap.existing}</strong>.{' '}
+              האם אתם בטוחים שאתם רוצים להחליף?
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button
+                onClick={handleConfirmSwap}
+                style={{
+                  width: '100%',
+                  background: '#dc2626',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                כן, בצע את ההחלפה
+              </button>
+              <button
+                onClick={handleCancelSwap}
+                style={{
+                  width: '100%',
+                  background: '#f1f5f9',
+                  color: '#334155',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                אופס, טעות — חזור אחורה
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {notification && (
         <div
           style={{
