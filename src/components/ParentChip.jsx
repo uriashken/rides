@@ -6,6 +6,10 @@ const COLOR_PALETTE = [
   { bg: '#0891b2', text: '#fff' },
   { bg: '#059669', text: '#fff' },
   { bg: '#d97706', text: '#fff' },
+  { bg: '#dc2626', text: '#fff' },
+  { bg: '#7c3aed', text: '#fff' },
+  { bg: '#db2777', text: '#fff' },
+  { bg: '#0284c7', text: '#fff' },
 ]
 
 const FALLBACK = { bg: '#6b7280', text: '#fff' }

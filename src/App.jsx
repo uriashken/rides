@@ -31,9 +31,9 @@ export default function App() {
   const [notification, setNotification] = useState(null)
   const [pendingSwap, setPendingSwap] = useState(null)
 
-  // Edit parents
+  // Edit parents — draftParents is [{key, originalName, name}]
   const [editingParents, setEditingParents] = useState(false)
-  const [draftParents, setDraftParents] = useState(DEFAULT_PARENTS)
+  const [draftParents, setDraftParents] = useState([])
 
   // Add manual event modal
   const [showAddEvent, setShowAddEvent] = useState(false)
@@ -89,7 +89,6 @@ export default function App() {
         setLastUpdated(data.updatedAt?.toDate?.() || null)
         if (data.parents?.length > 0) {
           setParents(data.parents)
-          setDraftParents(data.parents)
         }
         setManualEvents(data.manualEvents || [])
       }
@@ -164,29 +163,52 @@ export default function App() {
   // ─── Edit parents ───────────────────────────────────────────────────────────
 
   const handleStartEditParents = () => {
-    setDraftParents([...parents])
+    setDraftParents(parents.map((name, i) => ({ key: String(i), originalName: name, name })))
     setEditingParents(true)
   }
 
+  const handleDraftParentChange = (key, value) => {
+    setDraftParents((prev) => prev.map((d) => (d.key === key ? { ...d, name: value } : d)))
+  }
+
+  const handleRemoveDraftParent = (key) => {
+    setDraftParents((prev) => prev.filter((d) => d.key !== key))
+  }
+
+  const handleAddDraftParent = () => {
+    setDraftParents((prev) => [...prev, { key: `new_${Date.now()}`, originalName: null, name: '' }])
+  }
+
   const handleSaveParents = useCallback(() => {
-    // Remap existing assignments from old name → new name
     const newSlots = { ...assignments }
-    parents.forEach((oldName, i) => {
-      const newName = draftParents[i]
-      if (oldName !== newName) {
+
+    // Remap renamed parents
+    draftParents.forEach(({ originalName, name }) => {
+      if (originalName && originalName !== name) {
         Object.keys(newSlots).forEach((slotId) => {
-          if (newSlots[slotId] === oldName) newSlots[slotId] = newName
+          if (newSlots[slotId] === originalName) newSlots[slotId] = name
         })
       }
     })
+
+    // Clear assignments for removed parents
+    const survivingOriginals = new Set(draftParents.map((d) => d.originalName).filter(Boolean))
+    parents.forEach((oldName) => {
+      if (!survivingOriginals.has(oldName)) {
+        Object.keys(newSlots).forEach((slotId) => {
+          if (newSlots[slotId] === oldName) delete newSlots[slotId]
+        })
+      }
+    })
+
+    const newParents = draftParents.map((d) => d.name).filter(Boolean)
     setAssignments(newSlots)
-    setParents(draftParents)
+    setParents(newParents)
     setEditingParents(false)
-    saveAll(newSlots, draftParents, manualEvents)
+    saveAll(newSlots, newParents, manualEvents)
   }, [assignments, parents, draftParents, manualEvents, saveAll])
 
   const handleCancelEditParents = () => {
-    setDraftParents([...parents])
     setEditingParents(false)
   }
 
@@ -377,29 +399,40 @@ export default function App() {
           {editingParents ? (
             <div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '10px' }}>
-                {draftParents.map((name, i) => (
-                  <input
-                    key={i}
-                    value={name}
-                    onChange={(e) => {
-                      const next = [...draftParents]
-                      next[i] = e.target.value
-                      setDraftParents(next)
-                    }}
-                    style={{
-                      padding: '7px 12px',
-                      borderRadius: '999px',
-                      border: `2px solid ${getColorByIndex(i).bg}`,
-                      fontSize: '14px',
-                      fontFamily: 'Heebo, sans-serif',
-                      fontWeight: 600,
-                      color: '#1e293b',
-                      outline: 'none',
-                      textAlign: 'center',
-                      width: '140px',
-                    }}
-                  />
+                {draftParents.map(({ key, name }, i) => (
+                  <div key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                    <input
+                      value={name}
+                      onChange={(e) => handleDraftParentChange(key, e.target.value)}
+                      placeholder="שם הורה"
+                      style={{
+                        padding: '7px 12px',
+                        borderRadius: '999px',
+                        border: `2px solid ${getColorByIndex(i).bg}`,
+                        fontSize: '14px',
+                        fontFamily: 'Heebo, sans-serif',
+                        fontWeight: 600,
+                        color: '#1e293b',
+                        outline: 'none',
+                        textAlign: 'center',
+                        width: '130px',
+                      }}
+                    />
+                    <button
+                      onClick={() => handleRemoveDraftParent(key)}
+                      title="הסר"
+                      style={{ background: '#fef2f2', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer', color: '#dc2626', fontSize: '14px', fontWeight: 700, padding: 0, lineHeight: 1, flexShrink: 0 }}
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
+                <button
+                  onClick={handleAddDraftParent}
+                  style={{ background: '#f0fdf4', border: '2px dashed #86efac', borderRadius: '999px', padding: '7px 14px', fontSize: '13px', fontFamily: 'Heebo, sans-serif', fontWeight: 600, color: '#15803d', cursor: 'pointer' }}
+                >
+                  + הוסף
+                </button>
               </div>
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                 <button onClick={handleSaveParents} style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', padding: '7px 16px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
