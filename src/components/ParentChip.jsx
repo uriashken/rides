@@ -1,22 +1,30 @@
 import React from 'react'
 import { useDraggable } from '@dnd-kit/core'
 
-const COLORS = {
-  'אשכנזי-פומרנץ': { bg: '#4f46e5', text: '#fff' },
-  שיינקופף: { bg: '#0891b2', text: '#fff' },
-  גבראל: { bg: '#059669', text: '#fff' },
-  בירנבאום: { bg: '#d97706', text: '#fff' },
+const COLOR_PALETTE = [
+  { bg: '#4f46e5', text: '#fff' },
+  { bg: '#0891b2', text: '#fff' },
+  { bg: '#059669', text: '#fff' },
+  { bg: '#d97706', text: '#fff' },
+]
+
+const FALLBACK = { bg: '#6b7280', text: '#fff' }
+
+export function getParentColor(name, parents) {
+  if (!parents) return FALLBACK
+  const idx = parents.indexOf(name)
+  return idx >= 0 ? (COLOR_PALETTE[idx] || FALLBACK) : FALLBACK
 }
 
-export function getParentColor(name) {
-  return COLORS[name] || { bg: '#6b7280', text: '#fff' }
+export function getColorByIndex(index) {
+  return COLOR_PALETTE[index] || FALLBACK
 }
 
-export default function ParentChip({ name, dragId, small = false }) {
+export default function ParentChip({ name, dragId, small = false, colorIndex = 0 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: dragId || name })
 
-  const color = getParentColor(name)
+  const color = COLOR_PALETTE[colorIndex] || FALLBACK
 
   const style = {
     transform: transform

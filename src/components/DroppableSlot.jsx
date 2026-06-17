@@ -2,10 +2,10 @@ import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { getParentColor } from './ParentChip'
 
-export default function DroppableSlot({ id, label, assignedParent, onClear }) {
+export default function DroppableSlot({ id, label, assignedParent, onClear, parents }) {
   const { isOver, setNodeRef } = useDroppable({ id })
 
-  const color = assignedParent ? getParentColor(assignedParent) : null
+  const color = assignedParent ? getParentColor(assignedParent, parents) : null
 
   return (
     <div
