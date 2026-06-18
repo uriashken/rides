@@ -381,7 +381,7 @@ export default function App() {
       <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', padding: '24px 20px 20px', textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '6px' }}>
           <img src="/logo.png" alt="הפועל כפר סבא" style={{ height: '56px', width: '56px', objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: '4px' }} />
-          <h1 style={{ color: '#fff', fontSize: '22px', fontWeight: 800 }}>הסעות ילדים חצב</h1>
+          <h1 style={{ color: '#fff', fontSize: '22px', fontWeight: 800 }}>הסעות ילדים סביון</h1>
         </div>
         <p style={{ color: '#94a3b8', fontSize: '13px' }}>גררו שם אל אחד הסלוטים הפנויים</p>
         {lastUpdated && (
