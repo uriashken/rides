@@ -10,6 +10,7 @@ export const EVENT_LOCATIONS = {
   'רבין': '32.184862,34.911017',
   'רמז': '32.179275,34.938706',
   'אופירה': '32.188402,34.937370',
+  'אונים': '32.183233,34.907467',
 }
 
 export function getEventLocation(summary) {
