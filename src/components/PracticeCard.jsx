@@ -1,9 +1,41 @@
 import React from 'react'
 import DroppableSlot from './DroppableSlot'
 import { formatTime } from '../utils/calendarUtils'
+import { getEventLocation, buildNavUrl } from '../utils/locations'
+
+function NavButton({ destination }) {
+  return (
+    <a
+      href={buildNavUrl(destination)}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+      title="נווט למקום האירוע"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '3px',
+        background: '#eef2ff',
+        color: '#4f46e5',
+        border: '1px solid #c7d2fe',
+        borderRadius: '999px',
+        padding: '2px 9px',
+        fontSize: '11px',
+        fontWeight: 700,
+        textDecoration: 'none',
+        lineHeight: 1.6,
+        flexShrink: 0,
+      }}
+    >
+      <span style={{ fontSize: '12px' }}>🧭</span>
+      <span>ניווט</span>
+    </a>
+  )
+}
 
 function EventBadge({ event, onDeleteManual }) {
   const isGame = event.summary.includes('משחק')
+  const location = getEventLocation(event.summary)
   return (
     <div
       style={{
@@ -22,6 +54,7 @@ function EventBadge({ event, onDeleteManual }) {
         <div>
           <div style={{ fontWeight: 700, fontSize: '14px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}>
             {event.summary}
+            {location && <NavButton destination={location} />}
             {event.isManual && (
               <span style={{
                 fontSize: '10px',
