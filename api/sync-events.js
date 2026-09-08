@@ -34,6 +34,18 @@ async function getAccessToken() {
   return data.access_token
 }
 
+const TEAM_CALENDAR_ID = '2b132167e9f604026ac4f1fdb2e3870fd94369834b97d535de52e85116a1a28d@group.calendar.google.com'
+
+async function fetchCalendarItems(accessToken, calendarId, params) {
+  const resp = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?${params}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  )
+  const data = await resp.json()
+  if (!data.items) throw new Error(`שגיאה בקבלת אירועים: ${JSON.stringify(data)}`)
+  return data.items
+}
+
 async function fetchCalendarEvents(accessToken) {
   const now = new Date()
   now.setHours(0, 0, 0, 0)
@@ -49,22 +61,12 @@ async function fetchCalendarEvents(accessToken) {
     maxResults: '100',
   })
 
-  const calListResp = await fetch(
-    'https://www.googleapis.com/calendar/v3/users/me/calendarList',
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  )
-  const calList = await calListResp.json()
-  const targetCal = calList.items?.find((cal) => cal.summary?.includes('ילדים חצב'))
-  const calendarId = targetCal ? encodeURIComponent(targetCal.id) : 'primary'
+  const [teamItems, primaryItems] = await Promise.all([
+    fetchCalendarItems(accessToken, TEAM_CALENDAR_ID, params),
+    fetchCalendarItems(accessToken, 'primary', params),
+  ])
 
-  const eventsResp = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?${params}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  )
-  const eventsData = await eventsResp.json()
-  if (!eventsData.items) throw new Error(`שגיאה בקבלת אירועים: ${JSON.stringify(eventsData)}`)
-
-  const relevant = eventsData.items.filter((ev) => {
+  const relevantTeamEvents = teamItems.filter((ev) => {
     const summary = ev.summary || ''
     return (
       (summary.includes('אימון') && summary.includes('ילדים')) ||
@@ -73,7 +75,9 @@ async function fetchCalendarEvents(accessToken) {
     )
   })
 
-  return relevant.map((ev) => ({
+  const relevantPrimaryEvents = primaryItems.filter((ev) => (ev.summary || '').includes('חצב'))
+
+  return [...relevantTeamEvents, ...relevantPrimaryEvents].map((ev) => ({
     id: ev.id,
     summary: ev.summary,
     start: ev.start.dateTime || ev.start.date,
